@@ -20,9 +20,50 @@ angular.module('hello', [ 'ngRoute' ])
   $httpProvider.defaults.headers.common["X-Requested-With"] = 'XMLHttpRequest';
 
 })
+//CONTROLLER HOME
+
 .controller('home', function($scope, $http) {
   $http.get('/resource/').success(function(data) {
     $scope.greeting = data;
   })
 })
-.controller('navigation', function() {});
+
+//CONTROLLER NAVIGATION
+.controller('navigation',
+
+  function($rootScope, $scope, $http, $location) {
+
+  var authenticate = function(credentials, callback) {
+
+    var headers = credentials ? {authorization : "Basic "
+        + btoa(credentials.username + ":" + credentials.password)
+    } : {};
+
+    $http.get('user', {headers : headers}).success(function(data) {
+      if (data.name) {
+        $rootScope.authenticated = true;
+      } else {
+        $rootScope.authenticated = false;
+      }
+      callback && callback();
+    }).error(function() {
+      $rootScope.authenticated = false;
+      callback && callback();
+    });
+
+  }
+
+  authenticate();
+  $scope.credentials = {};
+  $scope.login = function() {
+      authenticate($scope.credentials, function() {
+        if ($rootScope.authenticated) {
+          $location.path("/");
+          $scope.error = false;
+        } else {
+          $location.path("/login");
+          $scope.error = true;
+        }
+      });
+  };
+});
