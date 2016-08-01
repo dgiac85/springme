@@ -1,35 +1,5 @@
-//angular.module('hello', [])
-  
-//.controller('home', function($scope, $http) {
-//	  $http.get('/resource/').success(function(data) {
-//		    $scope.greeting = data;
-//		  })
-//})
-
-angular.module('hello', [ 'ngRoute' ])
-.config(function($routeProvider, $httpProvider) {
-
-	$routeProvider.when('/', {
-		templateUrl : 'home.html',
-		controller : 'home'
-	}).when('/login', {
-		templateUrl : 'login.html',
-		controller : 'navigation'
-	}).otherwise('/');
-
-  $httpProvider.defaults.headers.common["X-Requested-With"] = 'XMLHttpRequest';
-
-})
-//CONTROLLER HOME
-
-.controller('home', function($scope, $http) {
-  $http.get('/resource/').success(function(data) {
-    $scope.greeting = data;
-  })
-})
-
 //CONTROLLER NAVIGATION
-.controller('navigation',
+angular.module('Controllers').controller('main', ['$rootScope', '$scope', '$http', '$location',
 
   function($rootScope, $scope, $http, $location) {
 
@@ -66,4 +36,13 @@ angular.module('hello', [ 'ngRoute' ])
         }
       });
   };
-});
+  
+  $scope.logout = function() {
+	  $http.post('logout', {}).success(function() {
+	    $rootScope.authenticated = false;
+	    $location.path("/");
+	  }).error(function(data) {
+	    $rootScope.authenticated = false;
+	  });
+	}
+}]);
